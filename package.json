@@ -13,3 +13,13 @@
     "tsx": "^4.0.0"
   }
 }
+{
+  "name": "my-topology-engine",
+  "version": "1.0.0",
+  "description": "Deterministic 10-step problem solving topology engine for MCP.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AGICoffe/my-topology-engine.git"
+  }
+}
