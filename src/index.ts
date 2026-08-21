@@ -1,76 +1,59 @@
-export default {
-  async fetch(request, env, ctx) {
-    // CORSエラー回避ヘッダー
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    };
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
-    if (request.method === "OPTIONS") {
-      return new Response(null, { headers: corsHeaders });
-    }
+const WORKER_URL = process.env.WORKER_URL || "https://my-topology-engine.my-agent-api.workers.dev";
 
-    try {
-      const body = await request.json();
-      const taskDescription = body.task_description || "指定なし";
-      const filledTemplate = body.filled_template || {};
+const server = new Server(
+  { name: "my-topology-engine", version: "1.0.0" },
+  { capabilities: { tools: {} } }
+);
 
-      // 1. 不変の問題解決トポロジー（10個のステップ定義）
-      const topologySteps = [
-        "1. 要求の構造化と意図抽出",
-        "2. 制約条件と前提パラメータの固定",
-        "3. 入力データのバリデーションと欠損補填",
-        "4. アナロジーの適用と解法フレームワークの選定",
-        "5. 成果物の全体骨組み（スケッチ）作成",
-        "6. 主要モジュール・ロジックの生成",
-        "7. 境界条件・例外ケースのチェック",
-        "8. フォーマット整形と美観調整",
-        "9. 最終検品と差分検証",
-        "10. 完成版成果物および次回用JSONテンプレートの付与"
-      ];
-
-      // 2. 決定論的なトポロジーに沿って10個の状態遷移成果物（スナップショット）を構築
-      // ※実際はここで軽量LLM API（Workers AIや外部API）を呼ぶか、JavaScriptのロジックで処理します
-      const snapshots = topologySteps.map((stepName, index) => {
-        return {
-          step: index + 1,
-          phase: stepName,
-          status: "completed",
-          // 各ステップごとの成果物モック
-          output_snapshot: `[Step ${index + 1} 成果物]: 「${taskDescription}」に対する${stepName}の処理が完了しました。`
-        };
-      });
-
-      // 3. 次回から劇的に精度を上げるための「JSON穴埋めテンプレート（付録）」
-      const nextIterationTemplate = {
-        _instruction: "次回はこの空欄を埋めて渡すか、AIエージェントと対話して埋めてください。",
-        project_goal: taskDescription,
-        target_audience: filledTemplate.target_audience || "[未設定：例 30代ビジネスパーソン]",
-        must_include_features: filledTemplate.must_include_features || ["[必須機能1]", "[必須機能2]"],
-        tone_and_style: filledTemplate.tone_and_style || "[トーン：例 シンプル・モダン]"
-      };
-
-      // 4. 結果をまとめてJSON返却
-      const responsePayload = {
-        success: true,
-        total_steps: 10,
-        snapshots: snapshots,
-        appendix_template: nextIterationTemplate
-      };
-
-      return new Response(JSON.stringify(responsePayload, null, 2), {
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json"
+// MCPツールの定義
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+  return {
+    tools: [
+      {
+        name: "execute_topology_engine",
+        description: "Executes a 10-step deterministic problem-solving topology engine to process tasks and generate state-transition snapshots.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            task_description: { 
+              type: "string", 
+              description: "The primary task or problem to be solved." 
+            },
+            filled_template: { 
+              type: "object", 
+              description: "Optional key-value parameters to constrain or guide the 10-step execution." 
+            }
+          },
+          required: ["task_description"]
         }
-      });
+      }
+    ]
+  };
+});
 
-    } catch (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 500,
-        headers: corsHeaders
-      });
-    }
+// ツールの実行処理（Cloudflare Workerへの転送）
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+  const { name, arguments: args } = request.params;
+
+  if (name === "execute_topology_engine") {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(args)
+    });
+
+    const data = await res.json();
+    return {
+      content: [{ type: "text", text: JSON.stringify(data, null, 2) }]
+    };
   }
-};
+
+  throw new Error(`Tool not found: ${name}`);
+});
+
+const transport = new StdioServerTransport();
+await server.connect(transport);
