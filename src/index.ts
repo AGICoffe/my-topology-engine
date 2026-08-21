@@ -1,0 +1,76 @@
+export default {
+  async fetch(request, env, ctx) {
+    // CORSエラー回避ヘッダー
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    };
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: corsHeaders });
+    }
+
+    try {
+      const body = await request.json();
+      const taskDescription = body.task_description || "指定なし";
+      const filledTemplate = body.filled_template || {};
+
+      // 1. 不変の問題解決トポロジー（10個のステップ定義）
+      const topologySteps = [
+        "1. 要求の構造化と意図抽出",
+        "2. 制約条件と前提パラメータの固定",
+        "3. 入力データのバリデーションと欠損補填",
+        "4. アナロジーの適用と解法フレームワークの選定",
+        "5. 成果物の全体骨組み（スケッチ）作成",
+        "6. 主要モジュール・ロジックの生成",
+        "7. 境界条件・例外ケースのチェック",
+        "8. フォーマット整形と美観調整",
+        "9. 最終検品と差分検証",
+        "10. 完成版成果物および次回用JSONテンプレートの付与"
+      ];
+
+      // 2. 決定論的なトポロジーに沿って10個の状態遷移成果物（スナップショット）を構築
+      // ※実際はここで軽量LLM API（Workers AIや外部API）を呼ぶか、JavaScriptのロジックで処理します
+      const snapshots = topologySteps.map((stepName, index) => {
+        return {
+          step: index + 1,
+          phase: stepName,
+          status: "completed",
+          // 各ステップごとの成果物モック
+          output_snapshot: `[Step ${index + 1} 成果物]: 「${taskDescription}」に対する${stepName}の処理が完了しました。`
+        };
+      });
+
+      // 3. 次回から劇的に精度を上げるための「JSON穴埋めテンプレート（付録）」
+      const nextIterationTemplate = {
+        _instruction: "次回はこの空欄を埋めて渡すか、AIエージェントと対話して埋めてください。",
+        project_goal: taskDescription,
+        target_audience: filledTemplate.target_audience || "[未設定：例 30代ビジネスパーソン]",
+        must_include_features: filledTemplate.must_include_features || ["[必須機能1]", "[必須機能2]"],
+        tone_and_style: filledTemplate.tone_and_style || "[トーン：例 シンプル・モダン]"
+      };
+
+      // 4. 結果をまとめてJSON返却
+      const responsePayload = {
+        success: true,
+        total_steps: 10,
+        snapshots: snapshots,
+        appendix_template: nextIterationTemplate
+      };
+
+      return new Response(JSON.stringify(responsePayload, null, 2), {
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json"
+        }
+      });
+
+    } catch (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: corsHeaders
+      });
+    }
+  }
+};
