@@ -1,0 +1,85 @@
+402決済成功と、同一トークン使用時のエラー
+
+icrosoft Windows [Version 10.0.26200.9168]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\Tutor of 0\Desktop\my-topology-engine>curl -X POST https://my-topology-engine.my-agent-api.workers.dev -H "Content-Type: application/json" -H "X-SOLANA-TX: 3B81ShcqRKjSvRYY5qpv5FKJMy7Ri29mzRijoUku6j1qikWrpor2wYRisNmwpAkDtwvxDaJiN2B1Gki33FiDfdhY" -d "{\"task_description\": \"実決済動作テスト\"}"
+{
+  "success": true,
+  "total_steps": 10,
+  "snapshots": [
+    {
+      "step": 1,
+      "phase": "1. 要求の構造化と意図抽出",
+      "status": "completed",
+      "output_snapshot": "[Step 1 成果物]: 「実決済動作テスト」に対する1. 要求の構造化と意図抽出の処理が完了しました。"
+    },
+    {
+      "step": 2,
+      "phase": "2. 制約条件と前提パラメータの固定",
+      "status": "completed",
+      "output_snapshot": "[Step 2 成果物]: 「実決済動作テスト」に対する2. 制約条件と前提パラメータの固定の処理が完了しました。"
+    },
+    {
+      "step": 3,
+      "phase": "3. 入力データのバリデーションと欠損補填",
+      "status": "completed",
+      "output_snapshot": "[Step 3 成果物]: 「実決済動作テスト」に対する3. 入力データのバリデーションと欠損補填の処理が完了しました。"
+    },
+    {
+      "step": 4,
+      "phase": "4. アナロジーの適用と解法フレームワークの選定",
+      "status": "completed",
+      "output_snapshot": "[Step 4 成果物]: 「実決済動作テスト」に対する4. アナロジーの適用と解法フレームワークの選定の処理が完了しました。"
+    },
+    {
+      "step": 5,
+      "phase": "5. 成果物の全体骨組み（スケッチ）作成",
+      "status": "completed",
+      "output_snapshot": "[Step 5 成果物]: 「実決済動作テスト」に対する5. 成果物の全体骨組み（スケッチ）作成の処理が完了しました。"
+    },
+    {
+      "step": 6,
+      "phase": "6. 主要モジュール・ロジックの生成",
+      "status": "completed",
+      "output_snapshot": "[Step 6 成果物]: 「実決済動作テスト」に対する6. 主要モジュール・ロジックの生成の処理が完了しました。"
+    },
+    {
+      "step": 7,
+      "phase": "7. 境界条件・例外ケースのチェック",
+      "status": "completed",
+      "output_snapshot": "[Step 7 成果物]: 「実決済動作テスト」に対する7. 境界条件・例外ケースのチェックの処理が完了しました。"
+    },
+    {
+      "step": 8,
+      "phase": "8. フォーマット整形と美観調整",
+      "status": "completed",
+      "output_snapshot": "[Step 8 成果物]: 「実決済動作テスト」に対する8. フォーマット整形と美観調整の処理が完了しました。"
+    },
+    {
+      "step": 9,
+      "phase": "9. 最終検品と差分検証",
+      "status": "completed",
+      "output_snapshot": "[Step 9 成果物]: 「実決済動作テスト」に対する9. 最終検品と差分検証の処理が完了しました。"
+    },
+    {
+      "step": 10,
+      "phase": "10. 完成版成果物および次回用JSONテンプレートの付与",
+      "status": "completed",
+      "output_snapshot": "[Step 10 成果物]: 「実決済動作テスト」に対する10. 完成版成果物および次回用JSONテンプレートの付与の処理が完了しました。"
+    }
+  ],
+  "appendix_template": {
+    "_instruction": "次回はこの空欄を埋めて渡すか、AIエージェントと対話して埋めてください。",
+    "project_goal": "実決済動作テスト",
+    "target_audience": "[未設定：例 30代ビジネスパーソン]",
+    "must_include_features": [
+      "[必須機能1]",
+      "[必須機能2]"
+    ],
+    "tone_and_style": "[トーン：例 シンプル・モダン]"
+  }
+}
+C:\Users\Tutor of 0\Desktop\my-topology-engine>curl -X POST https://my-topology-engine.my-agent-api.workers.dev -H "Content-Type: application/json" -H "X-SOLANA-TX: 3B81ShcqRKjSvRYY5qpv5FKJMy7Ri29mzRijoUku6j1qikWrpor2wYRisNmwpAkDtwvxDaJiN2B1Gki33FiDfdhY" -d "{\"task_description\": \"実決済動作テスト\"}"
+{"success":false,"status":"PAYMENT_EXPIRED","error":"402 Payment Required: This transaction signature has already been used."}
+C:\Users\Tutor of 0\Desktop\my-topology-engine>
